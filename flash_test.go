@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"reflect"
-	"testing"
-	"strings"
 	"strconv"
+	"strings"
+	"testing"
 	"time"
 
 	"github.com/lunny/tango"
@@ -95,6 +95,69 @@ func TestFlash(t *testing.T) {
 	expect(t, len(buff.String()), 0)
 	expect(t, buff.String(), "")
 }
+
+/*func TestFlashRedis(t *testing.T) {
+	buff := bytes.NewBufferString("")
+	recorder := httptest.NewRecorder()
+	recorder.Body = buff
+
+	tg := tango.Classic()
+	sessions := session.New(session.Options{
+		Store: redistore.New(redistore.Options{
+			Host:    "127.0.0.1",
+			DbIndex: 0,
+			MaxAge:  30 * time.Minute,
+		}),
+	})
+	tg.Use(Flashes(sessions))
+	tg.Any("/", new(FlashAction))
+
+	req, err := http.NewRequest("GET", "http://localhost:8000/", nil)
+	if err != nil {
+		t.Error(err)
+	}
+
+	tg.ServeHTTP(recorder, req)
+	expect(t, recorder.Code, http.StatusOK)
+	refute(t, len(buff.String()), 0)
+	expect(t, buff.String(), "test")
+
+	buff.Reset()
+
+	req, err = http.NewRequest("POST", "http://localhost:8000/", nil)
+	if err != nil {
+		t.Error(err)
+	}
+
+	cks := readSetCookies(recorder.Header())
+	for _, ck := range cks {
+		req.AddCookie(ck)
+	}
+	recorder.HeaderMap = make(map[string][]string)
+
+	tg.ServeHTTP(recorder, req)
+	expect(t, recorder.Code, http.StatusOK)
+	refute(t, len(buff.String()), 0)
+	expect(t, buff.String(), "test")
+
+	buff.Reset()
+
+	req, err = http.NewRequest("PUT", "http://localhost:8000/", nil)
+	if err != nil {
+		t.Error(err)
+	}
+
+	cks = readSetCookies(recorder.Header())
+	for _, ck := range cks {
+		req.AddCookie(ck)
+	}
+	recorder.HeaderMap = make(map[string][]string)
+
+	tg.ServeHTTP(recorder, req)
+	expect(t, recorder.Code, http.StatusOK)
+	expect(t, len(buff.String()), 0)
+	expect(t, buff.String(), "")
+}*/
 
 /* Test Helpers */
 func expect(t *testing.T, a interface{}, b interface{}) {
