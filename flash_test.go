@@ -70,7 +70,8 @@ func TestFlash(t *testing.T) {
 	for _, ck := range cks {
 		req.AddCookie(ck)
 	}
-	recorder.HeaderMap = make(map[string][]string)
+	recorder = httptest.NewRecorder()
+	recorder.Body = buff
 
 	tg.ServeHTTP(recorder, req)
 	expect(t, recorder.Code, http.StatusOK)
@@ -88,7 +89,8 @@ func TestFlash(t *testing.T) {
 	for _, ck := range cks {
 		req.AddCookie(ck)
 	}
-	recorder.HeaderMap = make(map[string][]string)
+	recorder = httptest.NewRecorder()
+	recorder.Body = buff
 
 	tg.ServeHTTP(recorder, req)
 	expect(t, recorder.Code, http.StatusOK)
