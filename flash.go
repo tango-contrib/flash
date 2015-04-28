@@ -1,3 +1,7 @@
+// Copyright 2015 The Tango Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 package flash
 
 import (
@@ -65,7 +69,7 @@ func (f *Flash) Save() {
 	}
 
 	for key, _ := range f.readed {
-		f.session.Del(f.Options.FlashName+f.Options.FlashSeperator+key)
+		f.session.Del(f.Options.FlashName + f.Options.FlashSeperator + key)
 	}
 
 	var keys = make([]string, 0)
@@ -115,7 +119,7 @@ func Flashes(sessions *session.Sessions, opts ...Options) tango.HandlerFunc {
 				fd := make(Data)
 				if keys, has := sess.Get(opt.FlashName).([]string); has {
 					for _, key := range keys {
-						fd[key] = sess.Get(opt.FlashName+opt.FlashSeperator+key)
+						fd[key] = sess.Get(opt.FlashName + opt.FlashSeperator + key)
 					}
 				}
 				flasher.setFlash(sess, fd, &opt)
