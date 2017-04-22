@@ -68,7 +68,7 @@ func (f *Flash) Save() {
 		return
 	}
 
-	for key, _ := range f.readed {
+	for key := range f.readed {
 		f.session.Del(f.Options.FlashName + f.Options.FlashSeperator + key)
 	}
 
@@ -107,28 +107,35 @@ func prepareOptions(opts []Options) Options {
 	return opt
 }
 
-// Flash return a FlashData handler.
+// Flashes return a FlashData handler.
 func Flashes(sessions *session.Sessions, opts ...Options) tango.HandlerFunc {
 	opt := prepareOptions(opts)
 	return func(ctx *tango.Context) {
 		var flasher Flasher
-		var ok bool
-		if action := ctx.Action(); action != nil {
-			if flasher, ok = action.(Flasher); ok {
-				sess := sessions.Session(ctx.Req(), ctx.ResponseWriter)
-				fd := make(Data)
-				if keys, has := sess.Get(opt.FlashName).([]string); has {
-					for _, key := range keys {
-						fd[key] = sess.Get(opt.FlashName + opt.FlashSeperator + key)
-					}
-				}
-				flasher.setFlash(sess, fd, &opt)
+		var flashed, ok bool
+
+		if flasher, ok = ctx.Action().(Flasher); ok {
+			// if session.Sessioner is implmentated just get it
+			var sess *session.Session
+			if sessinoer, ok := ctx.Action().(session.Sessioner); ok {
+				sess = sessinoer.GetSession()
+			} else {
+				sess = sessions.Session(ctx.Req(), ctx.ResponseWriter)
 			}
+
+			fd := make(Data)
+			if keys, has := sess.Get(opt.FlashName).([]string); has {
+				for _, key := range keys {
+					fd[key] = sess.Get(opt.FlashName + opt.FlashSeperator + key)
+				}
+			}
+			flasher.setFlash(sess, fd, &opt)
+			flashed = true
 		}
 
 		ctx.Next()
 
-		if ok {
+		if flashed {
 			flasher.Save()
 		}
 	}
