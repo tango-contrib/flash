@@ -5,6 +5,8 @@
 package flash
 
 import (
+	"net/url"
+
 	"github.com/lunny/tango"
 	"github.com/tango-contrib/session"
 )
@@ -60,6 +62,12 @@ func (f *Flash) Set(key string, value interface{}) {
 func (f *Flash) Add(kvs Data) {
 	for k, v := range kvs {
 		f.Set(k, v)
+	}
+}
+
+func (f *Flash) AddValues(values url.Values) {
+	for k, vals := range values {
+		f.Set(k, vals[0])
 	}
 }
 
